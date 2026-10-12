@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kvest — Global Portfolio Journal</title>
+<meta name="description" content="Kvest is a private, on-device investment journal for tracking global equities, ETFs, and crypto across multiple strategy-driven portfolios." />
+<style>
+  :root {
+    --bg: #0b0d10;
+    --bg-soft: #14181d;
+    --card: #1a1f26;
+    --border: #262c35;
+    --text: #e8ecf2;
+    --muted: #9aa3b2;
+    --accent: #6ee7b7;
+    --accent-2: #38bdf8;
+    --danger: #f87171;
+    --profit: #34d399;
+    --loss: #fb7185;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  header {
+    padding: 32px 0;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(11, 13, 16, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 10;
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.2px;
+    color: var(--text);
+  }
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    display: grid;
+    place-items: center;
+    color: #0b0d10;
+    font-weight: 800;
+  }
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+  }
+  nav a { color: var(--muted); font-size: 14px; }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  .hero {
+    padding: 80px 0 64px;
+    text-align: center;
+  }
+  .hero .pill {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+  h1 {
+    font-size: clamp(36px, 6vw, 56px);
+    line-height: 1.1;
+    margin: 0 0 20px;
+    letter-spacing: -0.02em;
+  }
+  h1 .gradient {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .lead {
+    color: var(--muted);
+    font-size: 18px;
+    max-width: 680px;
+    margin: 0 auto 32px;
+  }
+  .cta {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    color: #0b0d10;
+    font-weight: 700;
+    font-size: 15px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .cta:hover {
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px rgba(56, 189, 248, 0.25);
+  }
+  section {
+    padding: 64px 0;
+    border-top: 1px solid var(--border);
+  }
+  h2 {
+    font-size: 28px;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+  .section-sub {
+    color: var(--muted);
+    font-size: 16px;
+    margin: 0 0 40px;
+    max-width: 640px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .card .icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--bg-soft);
+    display: grid;
+    place-items: center;
+    margin-bottom: 16px;
+    font-size: 20px;
+  }
+  .card h3 {
+    font-size: 17px;
+    margin: 0 0 8px;
+  }
+  .card p {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0;
+  }
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .feature-list li {
+    padding: 14px 16px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .feature-list li::before {
+    content: "✓";
+    color: var(--profit);
+    margin-right: 10px;
+    font-weight: 700;
+  }
+  .markets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .markets span {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .support-card {
+    background: linear-gradient(135deg, rgba(110, 231, 183, 0.08), rgba(56, 189, 248, 0.08));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+  }
+  .support-card .email {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 12px 0 8px;
+    color: var(--text);
+  }
+  .support-card .hint {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  footer {
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-links a { color: var(--muted); margin-right: 18px; }
+  .footer-links a:last-child { margin-right: 0; }
+  @media (max-width: 600px) {
+    nav ul { gap: 14px; }
+    .hero { padding: 56px 0 40px; }
+    section { padding: 48px 0; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a href="#top" class="brand" style="text-decoration:none;">
+        <span class="brand-mark">K</span>
+        <span>Kvest</span>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#markets">Markets</a></li>
+          <li><a href="#privacy">Privacy</a></li>
+          <li><a href="#support">Support</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" style="border-top:none; padding-top: 64px;">
+      <div class="container">
+        <span class="pill">iPhone · iOS 16+ · On-device only</span>
+        <h1>A calm journal for your <span class="gradient">global portfolios</span>.</h1>
+        <p class="lead">Kvest is a private, on-device investment journal for active retail investors who want a single, focused workspace to track global equities, ETFs, and crypto across multiple strategy-driven portfolios.</p>
+        <a href="#support" class="cta">Get in touch</a>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="container">
+        <h2>Everything you need. Nothing you don't.</h2>
+        <p class="section-sub">No account, no cloud sync, no telemetry. Every trade, attachment, and note stays on your iPhone.</p>
+
+        <div class="grid">
+          <div class="card">
+            <div class="icon">📈</div>
+            <h3>Interactive Charts</h3>
+            <p>Candlestick, line, and area styles with 1D to ALL time ranges, pinch-to-zoom, and a long-press crosshair revealing OHLC, volume, and exact timestamps.</p>
+          </div>
+          <div class="card">
+            <div class="icon">💼</div>
+            <h3>Multiple Portfolios</h3>
+            <p>Build separate portfolios for long-term core holdings, growth bets, dividends, or any thesis you want isolated. Each gets its own allocation donut, holding list, and realized P&amp;L.</p>
+          </div>
+          <div class="card">
+            <div class="icon">🧾</div>
+            <h3>Trade Logging</h3>
+            <p>Log a buy or sell in seconds. Pick a portfolio, enter quantity and price, attach a photo of a receipt or chart, and Kvest immediately updates your cost basis and unrealized P&amp;L.</p>
+          </div>
+          <div class="card">
+            <div class="icon">🔒</div>
+            <h3>Private by Design</h3>
+            <p>All data is stored locally on your device. No logins, no notifications, no third-party dependencies. A one-tap reset lives in Settings whenever you want a fresh start.</p>
+          </div>
+        </div>
+
+        <h2 style="margin-top:48px;">Highlights</h2>
+        <ul class="feature-list" style="margin-top:16px;">
+          <li>Cost basis, market value, and unrealized P&amp;L recalculated instantly</li>
+          <li>Filter all trades by portfolio or direction</li>
+          <li>Average cost, current value, and per-name P&amp;L on every position</li>
+          <li>Cash position and realized P&amp;L tracked per portfolio</li>
+          <li>Custom dark theme with hand-drawn Core Graphics charts</li>
+          <li>Intuitive gestures: pinch, long-press, swipe</li>
+          <li>Receipts and chart snapshots attachable to any trade</li>
+          <li>One-tap data reset from Settings</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="markets">
+      <div class="container">
+        <h2>Global coverage</h2>
+        <p class="section-sub">Browse a watchlist of names across the world's major exchanges.</p>
+        <div class="markets">
+          <span>🇺🇸 United States</span>
+          <span>🇭🇰 Hong Kong</span>
+          <span>🇬🇧 London</span>
+          <span>🇨🇦 Toronto</span>
+          <span>🇦🇺 Sydney</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy">
+      <div class="container">
+        <h2>Your data stays yours</h2>
+        <p class="section-sub">Kvest is built around a simple principle: your financial journal is personal, and it should never leave your device unless you decide to export it.</p>
+        <div class="grid">
+          <div class="card">
+            <div class="icon">📱</div>
+            <h3>On-device storage</h3>
+            <p>Trades, notes, and attachments are stored locally on your iPhone. We don't operate servers that hold your data.</p>
+          </div>
+          <div class="card">
+            <div class="icon">🚫</div>
+            <h3>No tracking</h3>
+            <p>No analytics SDKs, no advertising identifiers, no third-party telemetry. Kvest doesn't know who you are.</p>
+          </div>
+          <div class="card">
+            <div class="icon">🗝️</div>
+            <h3>You stay in control</h3>
+            <p>Reset everything with a single tap from Settings. Uninstalling the app removes all of its data permanently.</p>
+          </div>
+        </div>
+        <p style="margin-top:24px; color: var(--muted); font-size: 14px;">
+          Read the full policy in our <a href="privacy.html">Privacy Policy</a>.
+        </p>
+      </div>
+    </section>
+
+    <section id="support">
+      <div class="container">
+        <h2>Support &amp; contact</h2>
+        <p class="section-sub">Questions, feedback, or a request? We'd love to hear from you.</p>
+        <div class="support-card">
+          <div style="color: var(--muted); font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em;">Support email</div>
+          <div class="email"><a href="mailto:litzybuziemextn527@gmail.com">litzybuziemextn527@gmail.com</a></div>
+          <div class="hint">We typically respond within two business days.</div>
+        </div>
+        <p style="margin-top:32px; color: var(--muted); font-size: 14px;">
+          By using Kvest you agree to our <a href="terms.html">Terms of Use</a>.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-row">
+      <div>© <span id="year"></span> Kvest. All rights reserved.</div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="mailto:litzybuziemextn527@gmail.com">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
